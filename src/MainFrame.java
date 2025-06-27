@@ -8,43 +8,77 @@ public class MainFrame extends JFrame {
     private JLabel resultLabel;
 
     public MainFrame() {
-        setTitle("Rupiah Currency Converter");
-        setSize(400, 250);
+        setTitle("Konversi Mata Uang Rupiah");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(400, 300);
         setLocationRelativeTo(null);
-        setLayout(new GridLayout(6, 1, 5, 5));
 
-        add(new JLabel("Masukkan Nilai Rupiah:", SwingConstants.CENTER));
+        // Panel utama
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // padding
+
+        // Judul
+        JLabel titleLabel = new JLabel("Konversi Rupiah ke Mata Uang Asing");
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        titleLabel.setForeground(new Color(0, 102, 204));
+
+        // Input Rupiah
+        JLabel inputLabel = new JLabel("Masukkan Nilai Rupiah:");
         inputField = new JTextField();
-        add(inputField);
+        inputField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
 
-        add(new JLabel("Pilih Mata Uang:", SwingConstants.CENTER));
-        currencyComboBox = new JComboBox<>(new String[] {"USD", "EUR", "JPY", "SGD"});
-        add(currencyComboBox);
+        // Combo box mata uang
+        JLabel currencyLabel = new JLabel("Pilih Mata Uang:");
+        String[] currencies = {"USD", "EUR", "JPY", "SGD"};
+        currencyComboBox = new JComboBox<>(currencies);
+        currencyComboBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
 
+        // Tombol convert
         JButton convertButton = new JButton("Convert");
-        add(convertButton);
+        convertButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        convertButton.setBackground(new Color(0, 153, 76));
+        convertButton.setForeground(Color.WHITE);
+        convertButton.setFocusPainted(false);
 
-        resultLabel = new JLabel("Hasil: ", SwingConstants.CENTER);
-        add(resultLabel);
+        // Label hasil
+        resultLabel = new JLabel("Hasil: ");
+        resultLabel.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        resultLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        resultLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
 
-        convertButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    double amount = Double.parseDouble(inputField.getText());
-                    String currency = (String) currencyComboBox.getSelectedItem();
-                    double result = CurrencyConverter.convert(amount, currency);
-                    resultLabel.setText(String.format("Hasil: %.2f %s", result, currency));
-                } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(MainFrame.this, "Masukkan angka yang valid!", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        });
+        // Tambahkan ke panel utama
+        mainPanel.add(titleLabel);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+        mainPanel.add(inputLabel);
+        mainPanel.add(inputField);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        mainPanel.add(currencyLabel);
+        mainPanel.add(currencyComboBox);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+        mainPanel.add(convertButton);
+        mainPanel.add(resultLabel);
+
+        // Tambahkan panel ke frame
+        add(mainPanel);
+
+        // Aksi tombol convert
+        convertButton.addActionListener(e -> convertCurrency());
+    }
+
+    private void convertCurrency() {
+        try {
+            double amount = Double.parseDouble(inputField.getText());
+            String selectedCurrency = (String) currencyComboBox.getSelectedItem();
+            double result = CurrencyConverter.convert(amount, selectedCurrency);
+            resultLabel.setText(String.format("Hasil: %.2f %s", result, selectedCurrency));
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Masukkan angka yang valid!", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            new MainFrame().setVisible(true);
-        });
+        SwingUtilities.invokeLater(() -> new MainFrame().setVisible(true));
     }
 }
